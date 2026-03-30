@@ -1,0 +1,59 @@
+# -------------------------
+# Core Backend
+# -------------------------
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-dotenv==1.0.1
+
+# -------------------------
+# Database
+# -------------------------
+sqlalchemy==2.0.32
+psycopg2-binary==2.9.9
+
+# -------------------------
+# Auth & Security
+# -------------------------
+passlib[bcrypt]==1.7.4
+python-jose==3.3.0
+
+# -------------------------
+# File Uploads
+# -------------------------
+python-multipart==0.0.9
+
+# -------------------------
+# PDF Processing
+# -------------------------
+pymupdf==1.24.9   # (fitz)
+
+# -------------------------
+# AI / RAG
+# -------------------------
+numpy==1.26.4
+scikit-learn==1.5.1
+
+# Embeddings (local or fallback)
+sentence-transformers==3.0.1
+
+# Vector DB
+faiss-cpu==1.8.0
+
+# -------------------------
+# Mistral LLM
+# -------------------------
+mistralai==1.2.0
+
+# -------------------------
+# HTTP Requests (for APIs)
+# -------------------------
+httpx==0.27.0
+
+# -------------------------
+# Utilities
+# -------------------------
+pydantic==2.9.2
+tqdm==4.66.5
+
+langchain==0.2.14
+langchain-community==0.2.12
