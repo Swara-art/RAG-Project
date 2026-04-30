@@ -22,6 +22,18 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def test_docs():
     return {"status": "ok"}
 
+@router.get("/")
+def list_documents(db: Session = Depends(get_db)):
+    documents = db.query(Document).order_by(Document.id.desc()).all()
+    return [
+        {
+            "id": document.id,
+            "filename": document.filename,
+            "filepath": document.filepath,
+        }
+        for document in documents
+    ]
+
 @router.post("/upload")
 async def upload_document(file: UploadFile = File(...), db: Session = Depends(get_db)):
     file_location = f"{UPLOAD_DIR}/{file.filename}"
@@ -62,6 +74,8 @@ async def upload_document(file: UploadFile = File(...), db: Session = Depends(ge
     return {
         "message": "File uploaded and processed successfully",
         "document_id": new_doc.id,
+        "filename": new_doc.filename,
+        "filepath": new_doc.filepath,
         "chunks_created": len(chunks),
         "embeddings_added": len(embeddings)
     }

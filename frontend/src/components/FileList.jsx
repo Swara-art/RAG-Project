@@ -14,16 +14,16 @@ export default function FileList({ files }) {
             <p className="text-slate-400 text-sm font-medium">No documents yet.</p>
           </div>
         ) : (
-          files.map((file, index) => (
+          files.map((file) => (
             <div
-              key={index}
+              key={file.id}
               className="flex items-center gap-4 bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 hover:bg-white hover:border-indigo-200 transition-all duration-200 group"
             >
               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-xl shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
                 📄
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-slate-900 text-sm font-bold truncate">{file}</p>
+                <p className="text-slate-900 text-sm font-bold truncate">{file.filename}</p>
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                   <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Ready to analyze</p>
@@ -35,4 +35,4 @@ export default function FileList({ files }) {
       </div>
     </div>
   );
-}
+}

@@ -1,7 +1,12 @@
 import { useState } from "react"; 
 import { streamChatAnswer } from "../services/api";
 
-export default function ChatInput({ setMessages }) {
+export default function ChatInput({
+  activeChatId,
+  setActiveChatId,
+  setMessages,
+  refreshChatSessions,
+}) {
 
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +25,7 @@ export default function ChatInput({ setMessages }) {
       setInput("");
 
       try {
-        await streamChatAnswer(question, (chunk) => {
+        const sessionId = await streamChatAnswer(question, (chunk) => {
           setMessages((prev) => {
             const next = [...prev];
             const streamingIndex = next.findLastIndex((msg) => msg.isStreaming);
@@ -36,13 +41,18 @@ export default function ChatInput({ setMessages }) {
 
             return next;
           });
-        });
+        }, activeChatId);
 
         setMessages((prev) =>
           prev.map((msg) =>
             msg.isStreaming ? { ...msg, isStreaming: false } : msg
           )
         );
+
+        if (sessionId) {
+          setActiveChatId(Number(sessionId));
+        }
+        refreshChatSessions();
       } catch (err) {
         console.error(err);
         setMessages((prev) => {

@@ -20,10 +20,15 @@ API.interceptors.request.use(
   }
 );
 
-export async function streamChatAnswer(query, onChunk) {
+export async function streamChatAnswer(query, onChunk, sessionId) {
   const token = localStorage.getItem("token");
+  const params = new URLSearchParams({ query });
+  if (sessionId) {
+    params.set("session_id", sessionId);
+  }
+
   const response = await fetch(
-    `${API_BASE_URL}/chat/ask/stream?query=${encodeURIComponent(query)}`,
+    `${API_BASE_URL}/chat/ask/stream?${params.toString()}`,
     {
       method: "POST",
       headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -51,6 +56,8 @@ export async function streamChatAnswer(query, onChunk) {
   if (finalChunk) {
     onChunk(finalChunk);
   }
+
+  return response.headers.get("X-Chat-Session-Id");
 }
 
 export default API;

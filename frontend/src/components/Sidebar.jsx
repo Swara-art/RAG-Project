@@ -1,14 +1,4 @@
-import { Link } from "react-router-dom";
-import { NavLink } from "react-router-dom";
-
-export default function Sidebar() {
-  const menuItems = [
-    { name: "Dashboard", path: "/dashboard", icon: "📊" },
-    { name: "My Documents", path: "/documents", icon: "📄" },
-    { name: "Chat History", path: "/history", icon: "💬" },
-    { name: "Settings", path: "/settings", icon: "⚙️" },
-  ];
-
+export default function Sidebar({ chatSessions, activeChatId, onSelectChat, onNewChat }) {
   return (
     <aside className="w-64 min-h-screen bg-white border-r border-slate-100 px-6 py-8 hidden md:flex flex-col">
       <div className="mb-10 flex items-center gap-3">
@@ -21,23 +11,59 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav className="space-y-2 flex-1">
-        {menuItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                isActive
-                  ? "bg-indigo-50 text-indigo-700 shadow-sm"
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-              }`
-            }
+      <nav className="space-y-6 flex-1 overflow-hidden">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium bg-indigo-50 text-indigo-700 shadow-sm">
+            <span className="text-lg">📊</span>
+            Dashboard
+          </div>
+          <a
+            href="#documents"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200"
           >
-            <span className="text-lg">{item.icon}</span>
-            {item.name}
-          </NavLink>
-        ))}
+            <span className="text-lg">📄</span>
+            My Documents
+          </a>
+        </div>
+
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex items-center justify-between px-4 mb-2">
+            <div className="flex items-center gap-3 text-slate-500 font-medium">
+              <span className="text-lg">💬</span>
+              Chat History
+            </div>
+            <button
+              onClick={onNewChat}
+              className="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+              title="New chat"
+            >
+              +
+            </button>
+          </div>
+
+          <div className="space-y-1 overflow-y-auto pr-1 custom-scrollbar">
+            {chatSessions.length === 0 ? (
+              <p className="px-4 py-3 text-xs font-medium text-slate-400">
+                Your previous chats will appear here.
+              </p>
+            ) : (
+              chatSessions.map((chat) => (
+                <button
+                  key={chat.id}
+                  onClick={() => onSelectChat(chat.id)}
+                  className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium truncate transition-all duration-200 ${
+                    activeChatId === chat.id
+                      ? "bg-slate-900 text-white shadow-sm"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
+                  title={chat.title}
+                >
+                  {chat.title}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
       </nav>
 
       <div className="mt-auto">
@@ -52,4 +78,4 @@ export default function Sidebar() {
     </aside>
   );
 }
-
+

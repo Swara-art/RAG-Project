@@ -21,8 +21,14 @@ export default function UploadBox({ setFiles }) {
           },
         });
 
-        console.log("Uploaded:", res.data);
-        setFiles((prev) => [...prev, file.name]);
+        setFiles((prev) => [
+          {
+            id: res.data.document_id,
+            filename: res.data.filename,
+            filepath: res.data.filepath,
+          },
+          ...prev,
+        ]);
       } catch (err) {
         console.error("Upload error for", file.name, ":", err);
       }
@@ -77,4 +83,4 @@ export default function UploadBox({ setFiles }) {
       <p className="mt-4 text-[10px] uppercase tracking-widest text-slate-400 font-bold">Max 10MB per file</p>
     </div>
   );
-}
+}
