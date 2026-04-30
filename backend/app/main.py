@@ -9,6 +9,7 @@ load_dotenv()
 from fastapi import FastAPI
 from app.routes import document_routes
 from app.routes import chat_routes
+from app.routes import auth_routes
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -22,6 +23,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.include_router(auth_routes.router)
 app.include_router(document_routes.router, prefix="/documents", tags=["Documents"])
 app.include_router(chat_routes.router, prefix="/chat", tags=["Chat"])
 

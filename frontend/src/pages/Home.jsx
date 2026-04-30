@@ -1,21 +1,17 @@
-import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import HowItWorks from "../components/HowItWorks";
 import Footer from "../components/Footer";
 
 export default function Home() {
   return (
-    <div className="bg-black text-white min-h-screen relative overflow-hidden">
+    <div className="bg-[#F8FAFC] text-slate-900 min-h-screen relative overflow-hidden">
 
-      {/* Glow Background */}
-      <div className="absolute top-[-300px] left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-lime-400 opacity-10 blur-[200px] rounded-full"></div>
-
-      {/* Subtle radial overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#111_0%,_black_70%)]"></div>
+      {/* Decorative Background Elements */}
+      <div className="absolute top-[-200px] right-[-100px] w-[600px] h-[600px] bg-indigo-100 opacity-50 blur-[120px] rounded-full"></div>
+      <div className="absolute bottom-[-100px] left-[-100px] w-[500px] h-[500px] bg-rose-50 opacity-40 blur-[100px] rounded-full"></div>
 
       {/* Content */}
       <div className="relative z-10">
-        <Navbar />
         <Hero />
         <HowItWorks />
         <Footer />
@@ -23,4 +19,4 @@ export default function Home() {
 
     </div>
   );
-}
+}

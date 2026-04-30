@@ -1,5 +1,5 @@
 from langchain_community.document_loaders import PyMuPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from fastapi import APIRouter, UploadFile, File, Depends
 from app.db.session import get_db
@@ -18,6 +18,10 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
+@router.get("/test")
+def test_docs():
+    return {"status": "ok"}
+
 @router.post("/upload")
 async def upload_document(file: UploadFile = File(...), db: Session = Depends(get_db)):
     file_location = f"{UPLOAD_DIR}/{file.filename}"
@@ -25,7 +29,6 @@ async def upload_document(file: UploadFile = File(...), db: Session = Depends(ge
         f.write(await file.read())
 
     new_doc = Document(
-        user_id=1,
         filename=file.filename,
         filepath=file_location
     )
