@@ -1,5 +1,5 @@
 import { useState } from "react"; 
-import API from "../services/api";
+import { streamChatAnswer } from "../services/api";
 
 export default function ChatInput({ setMessages }) {
 
@@ -7,41 +7,63 @@ export default function ChatInput({ setMessages }) {
   const [loading, setLoading] = useState(false);
 
   const handleSend = async () => {
-      if (!input || loading) return;
+      const question = input.trim();
+      if (!question || loading) return;
 
       setMessages((prev) => [
         ...prev,
-        { sender: "user", text: input },
+        { sender: "user", text: question },
+        { sender: "ai", text: "", isStreaming: true },
       ]);
 
       setLoading(true);
+      setInput("");
 
       try {
-        const res = await API.post("/chat/ask", null, {
-          params: { query: input },
+        await streamChatAnswer(question, (chunk) => {
+          setMessages((prev) => {
+            const next = [...prev];
+            const streamingIndex = next.findLastIndex((msg) => msg.isStreaming);
+
+            if (streamingIndex === -1) {
+              return next;
+            }
+
+            next[streamingIndex] = {
+              ...next[streamingIndex],
+              text: `${next[streamingIndex].text}${chunk}`,
+            };
+
+            return next;
+          });
         });
 
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: "ai",
-            text: res.data.answer,
-            source: res.data.source,
-          },
-        ]);
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.isStreaming ? { ...msg, isStreaming: false } : msg
+          )
+        );
       } catch (err) {
         console.error(err);
-        setMessages((prev) => [
-          ...prev,
-          {
+        setMessages((prev) => {
+          const next = [...prev];
+          const streamingIndex = next.findLastIndex((msg) => msg.isStreaming);
+          const errorMessage = {
             sender: "ai",
             text: "Sorry, I encountered an error. Please try again.",
-          },
-        ]);
+            isStreaming: false,
+          };
+
+          if (streamingIndex === -1) {
+            return [...next, errorMessage];
+          }
+
+          next[streamingIndex] = errorMessage;
+          return next;
+        });
       }
 
       setLoading(false);
-      setInput("");
     };
 
   return (
@@ -60,9 +82,9 @@ export default function ChatInput({ setMessages }) {
 
       <button
         onClick={handleSend}
-        disabled={!input || loading}
+        disabled={!input.trim() || loading}
         className={`px-6 py-3 rounded-2xl font-bold transition-all duration-200 flex items-center gap-2 ${
-          !input || loading 
+          !input.trim() || loading 
           ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
           : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100 active:scale-95"
         }`}
@@ -76,4 +98,4 @@ export default function ChatInput({ setMessages }) {
       </button>
     </div>
   );
-}
+}

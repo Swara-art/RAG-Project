@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from app.services.rag_service import ask_question
+from fastapi.responses import StreamingResponse
+from app.services.rag_service import ask_question, stream_answer
 
 router = APIRouter()
 
@@ -35,5 +36,15 @@ def ask(query: str):
     answer = ask_question(formatted_query)
     formatted_answer = format_response(answer)
     return {"answer": formatted_answer}
+
+@router.post("/ask/stream")
+def ask_stream(query: str):
+    formatted_query = format_response(query)
+
+    def response_generator():
+        for chunk in stream_answer(formatted_query):
+            yield chunk
+
+    return StreamingResponse(response_generator(), media_type="text/plain")
 
 

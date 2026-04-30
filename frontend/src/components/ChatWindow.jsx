@@ -1,7 +1,14 @@
+import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 export default function ChatWindow({ messages, loading }) {
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
   return (
     <div className="bg-white border border-slate-100 rounded-3xl p-6 h-[600px] flex flex-col card-shadow">
       <div className="flex items-center gap-3 border-b border-slate-50 pb-4 mb-4">
@@ -36,7 +43,7 @@ export default function ChatWindow({ messages, loading }) {
                 className={`max-w-[85%] px-5 py-4 rounded-2xl text-sm leading-relaxed ${
                   msg.sender === "user"
                     ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100 rounded-tr-none"
-                    : "bg-slate-50 text-slate-800 border border-slate-100 rounded-tl-none"
+                    : "bg-slate-50 text-slate-800 border border-slate-100 rounded-tl-none shadow-sm"
                 }`}
               >
                 {/* 📄 Source */}
@@ -49,42 +56,56 @@ export default function ChatWindow({ messages, loading }) {
                 {/* 💬 Message */}
                 {msg.sender === "ai" ? (
                   <div
-                    className="prose prose-slate prose-sm max-w-none
-                               prose-p:my-2
-                               prose-headings:mt-4 prose-headings:mb-2
-                               prose-li:my-1
+                    className="prose prose-slate prose-sm max-w-none text-[15px] leading-7
+                               prose-p:my-3 prose-p:leading-7
+                               prose-headings:font-extrabold prose-headings:text-slate-950
+                               prose-h2:mt-6 prose-h2:mb-3 prose-h2:border-b prose-h2:border-slate-200 prose-h2:pb-2
+                               prose-h3:mt-5 prose-h3:mb-2
+                               prose-ul:my-4 prose-ol:my-4 prose-li:my-1.5
+                               prose-hr:my-6 prose-hr:border-slate-200
                                prose-strong:text-indigo-700
                                prose-code:text-indigo-600 prose-code:bg-indigo-50 prose-code:px-1 prose-code:rounded"
                   >
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      components={{
-                        table: ({ children }) => (
-                          <div className="overflow-x-auto my-4 rounded-xl border border-slate-200">
-                            <table className="table-auto w-full text-left">
+                    {msg.text ? (
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          table: ({ children }) => (
+                            <div className="overflow-x-auto my-5 rounded-xl border border-slate-200 bg-white">
+                              <table className="table-auto w-full text-left">
+                                {children}
+                              </table>
+                            </div>
+                          ),
+                          thead: ({ children }) => (
+                            <thead className="bg-slate-100/70">
                               {children}
-                            </table>
-                          </div>
-                        ),
-                        thead: ({ children }) => (
-                          <thead className="bg-slate-100/50">
-                            {children}
-                          </thead>
-                        ),
-                        th: ({ children }) => (
-                          <th className="px-4 py-3 text-slate-900 font-bold border-b border-slate-200">
-                            {children}
-                          </th>
-                        ),
-                        td: ({ children }) => (
-                          <td className="px-4 py-3 border-b border-slate-50">
-                            {children}
-                          </td>
-                        ),
-                      }}
-                    >
-                      {msg.text}
-                    </ReactMarkdown>
+                            </thead>
+                          ),
+                          th: ({ children }) => (
+                            <th className="px-4 py-3 text-slate-900 font-bold border-b border-slate-200">
+                              {children}
+                            </th>
+                          ),
+                          td: ({ children }) => (
+                            <td className="px-4 py-3 border-b border-slate-100 align-top">
+                              {children}
+                            </td>
+                          ),
+                        }}
+                      >
+                        {msg.text}
+                      </ReactMarkdown>
+                    ) : (
+                      <div className="flex items-center gap-1.5 py-1">
+                        <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></div>
+                        <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                        <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                      </div>
+                    )}
+                    {msg.isStreaming && msg.text && (
+                      <span className="inline-block w-2 h-4 ml-1 align-[-2px] bg-indigo-500 rounded-sm animate-pulse"></span>
+                    )}
                   </div>
                 ) : (
                   <p className="font-medium">{msg.text}</p>
@@ -107,7 +128,8 @@ export default function ChatWindow({ messages, loading }) {
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
     </div>
   );
-}
+}

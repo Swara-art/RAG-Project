@@ -13,21 +13,20 @@ model = ChatMistralAI(
     mistral_api_key=api_key
 )
 
-def ask_question(query: str):
+def build_prompt(query: str):
     query_embedding = get_embedding(query)
 
     relevant_chunks = list(set(search(query_embedding, k=8)))
-    
 
     context = "\n\n".join(relevant_chunks)
 
-    prompt = f"""
+    return f"""
 You are an AI tutor that explains concepts clearly and beautifully.
 
 FORMAT RULES (VERY IMPORTANT):
 - Use clear section headings (##, ###)
 - Use bullet points instead of long paragraphs
-- Add spacing between sections
+- Add one blank line between headings, paragraphs, bullets, and sections
 - Use emojis/icons to improve readability
 - Highlight key terms using **bold**
 - Keep sentences short and simple
@@ -50,6 +49,21 @@ Question:
 {query}
 """
 
+def ask_question(query: str):
+    prompt = build_prompt(query)
     response = model.invoke(prompt)
 
     return response.content
+
+def stream_answer(query: str):
+    prompt = build_prompt(query)
+
+    for chunk in model.stream(prompt):
+        content = getattr(chunk, "content", "")
+        if isinstance(content, list):
+            content = "".join(
+                item.get("text", "") if isinstance(item, dict) else str(item)
+                for item in content
+            )
+        if content:
+            yield content
